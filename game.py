@@ -1,4 +1,5 @@
 import pygame
+from player import Player
 
 pygame.init()
 
@@ -13,6 +14,7 @@ RIGHT = 3
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
+player = Player()
 
 run = True
 while run:
@@ -24,6 +26,8 @@ while run:
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       run = False
+      
+  player.draw(screen)
 
   pygame.display.flip()
     
