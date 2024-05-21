@@ -23,6 +23,22 @@ while run:
   
   screen.fill((255,255,255))
   
+  # detect any key pressed while game is running
+  key = pygame.key.get_pressed()
+  if key[pygame.K_DOWN] == True:
+    player.move(DOWN)
+  if key[pygame.K_UP] == True:
+    player.move(UP)
+  if key[pygame.K_LEFT] == True:
+    player.move(LEFT)
+  if key[pygame.K_RIGHT] == True:
+    player.move(RIGHT)
+    
+  # stop move if no key is pressed
+  if (key[pygame.K_DOWN] == False and key[pygame.K_UP] == False and
+      key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False):
+    player.stop_move()
+  
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       run = False
