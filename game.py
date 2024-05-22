@@ -25,23 +25,35 @@ while run:
   
   # detect any key pressed while game is running
   key = pygame.key.get_pressed()
-  if key[pygame.K_DOWN] == True:
+  if key[pygame.K_DOWN] == True or key[pygame.K_s] == True:
     player.move(DOWN)
-  if key[pygame.K_UP] == True:
+  if key[pygame.K_UP] == True  or key[pygame.K_w] == True:
     player.move(UP)
-  if key[pygame.K_LEFT] == True:
+  if key[pygame.K_LEFT] == True or key[pygame.K_a] == True:
     player.move(LEFT)
-  if key[pygame.K_RIGHT] == True:
+  if key[pygame.K_RIGHT] == True or key[pygame.K_d] == True:
     player.move(RIGHT)
     
   # stop move if no key is pressed
   if (key[pygame.K_DOWN] == False and key[pygame.K_UP] == False and
-      key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False):
+      key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False and
+      key[pygame.K_w] == False and key[pygame.K_s] == False and
+      key[pygame.K_a] == False and key[pygame.K_d] == False):
     player.stop_move()
   
   for event in pygame.event.get():
+    # listen to hold l shift key
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_LSHIFT:
+      player.start_running()
+    elif event.type == pygame.KEYUP and event.key == pygame.K_LSHIFT:
+      player.stop_running()
+    
+    # quit the game
     if event.type == pygame.QUIT:
       run = False
+      
+  # update code
+  player.update()
       
   player.draw(screen)
 

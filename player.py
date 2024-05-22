@@ -6,6 +6,7 @@ class Player:
   MOVING_STATE = 1
   
   WALK_SPEED = 3
+  RUN_SPEED = 6
   
   DOWN = 0
   UP = 1
@@ -14,6 +15,13 @@ class Player:
   
   FRAME_SIZE = (100, 100)
   
+  # Animations
+  WALK_DURATION = 6
+  RUN_DURATION = 4
+  IDLE_ANIMATION = [(0, 60)]
+  WALK_ANIMATION = [(0, WALK_DURATION), (1, WALK_DURATION), (0, WALK_DURATION), (2, WALK_DURATION)]
+  RUN_ANIMATION = [(0, RUN_DURATION), (3, RUN_DURATION), (0, RUN_DURATION), (4, RUN_DURATION)]
+  
   # Variables
   # starting position of the character
   pos_x = 400   # horizontal position 
@@ -21,6 +29,15 @@ class Player:
   
   current_state = IDLE_STATE    # state of sprite
   current_direction = DOWN      # sprite view direction
+  
+  current_frame = 0
+  current_animation = None
+  
+  frame_counter = 0
+  current_duration = 0
+  animation_index = 0
+  
+  running = False
   
   # rectangle to print the sprite to screen
   frame_rect = None     # rectangle position of the character from the png file
@@ -42,24 +59,78 @@ class Player:
   def draw(self, screen):
     screen.blit(self.spritesheet, self.screen_rect, self.frame_rect)
     
+  # function to call when changing the frame of the sprite
+  def set_frame(self, frame):
+    self.current_frame = frame
+    cur_row = self.current_direction
+    cur_col = self.current_frame
+    
+    self.frame_rect.topleft = (cur_col * self.FRAME_SIZE[0], cur_row * self.FRAME_SIZE[1])
+  
+  def next_frame(self):
+    self.current_frame = self.current_animation[self.animation_index][0]
+    self.current_duration = self.current_animation[self.animation_index][1]
+    
+  def set_animation(self, animation):
+    self.current_animation = animation
+    self.animation_index = 0
+    
+    self.frame_counter = 0
+    self.next_frame()
+    self.set_frame(self.current_frame)
+    
+  def update_animation(self):
+    self.frame_counter += 1
+    
+    if self.frame_counter >= self.current_duration:
+      self.frame_counter = 0
+      self.animation_index += 1
+      if self.animation_index >= len(self.current_animation):
+        self.animation_index = 0
+      self.next_frame()
+      self.set_frame(self.current_frame)
+  
   # function to call when any arrow key is pressed, update the position of character and it's direction
   def move(self, direction):
-    self.current_state = self.MOVING_STATE
+    speed = 0
+    if self.running:
+      speed = self.RUN_SPEED
+    else:
+      speed = self.WALK_SPEED
+    
+    if self.current_state != self.MOVING_STATE:
+      self.current_state = self.MOVING_STATE
+      if self.running:
+        self.set_animation(self.RUN_ANIMATION)
+      else:
+        self.set_animation(self.WALK_ANIMATION)
+    
     if direction == self.DOWN:
-      self.pos_y += self.WALK_SPEED
       self.current_direction = self.DOWN
-    if direction == self.UP:
-      self.pos_y -= self.WALK_SPEED
+      self.pos_y += speed
+    elif direction == self.UP:
       self.current_direction = self.UP
-    if direction == self.RIGHT:
-      self.pos_x += self.WALK_SPEED
+      self.pos_y -= speed
+    elif direction == self.RIGHT:
       self.current_direction = self.RIGHT
-    if direction == self.LEFT:
-      self.pos_x -= self.WALK_SPEED
+      self.pos_x += speed
+    elif direction == self.LEFT:
       self.current_direction = self.LEFT
-      
+      self.pos_x -= speed
+            
     self.screen_rect.center = (self.pos_x, self.pos_y) # update the location
-    self.frame_rect.topleft = (0, 100*self.current_direction) # update the direction
       
   def stop_move(self):
     self.current_state = self.IDLE_STATE
+    self.set_animation(self.IDLE_ANIMATION)
+    
+  def start_running(self):
+    self.running = True
+    self.set_animation(self.RUN_ANIMATION)
+      
+  def stop_running(self):
+    self.running = False
+    self.set_animation(self.WALK_ANIMATION)
+    
+  def update(self):
+    self.update_animation()
