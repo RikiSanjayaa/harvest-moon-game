@@ -42,6 +42,9 @@ while run:
     player.stop_move()
   
   for event in pygame.event.get():
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+      player.use_tool()
+    
     # listen to hold l shift key
     if event.type == pygame.KEYDOWN and event.key == pygame.K_LSHIFT:
       player.start_running()

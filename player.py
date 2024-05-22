@@ -4,6 +4,7 @@ class Player:
   # State consts
   IDLE_STATE = 0
   MOVING_STATE = 1
+  USING_STATE = 2
   
   WALK_SPEED = 3
   RUN_SPEED = 6
@@ -21,6 +22,7 @@ class Player:
   IDLE_ANIMATION = [(0, 60)]
   WALK_ANIMATION = [(0, WALK_DURATION), (1, WALK_DURATION), (0, WALK_DURATION), (2, WALK_DURATION)]
   RUN_ANIMATION = [(0, RUN_DURATION), (3, RUN_DURATION), (0, RUN_DURATION), (4, RUN_DURATION)]
+  TILLING_ANIMATION = [(12, 15), (13, 4), (14, 8), (15, 30)]
   
   # Variables
   # starting position of the character
@@ -54,6 +56,7 @@ class Player:
     self.screen_rect = pygame.Rect(self.pos_x, self.pos_y, self.FRAME_SIZE[0], self.FRAME_SIZE[1])
     # center the sprite
     self.screen_rect.center = (self.pos_x, self.pos_y)
+    self.set_animation(self.IDLE_ANIMATION)
     
   # function to call to draw/render the sprite to the screen, need screen as input
   def draw(self, screen):
@@ -87,12 +90,23 @@ class Player:
       self.animation_index += 1
       if self.animation_index >= len(self.current_animation):
         self.animation_index = 0
+        if self.current_state == self.USING_STATE:
+          self.current_state = self.IDLE_STATE
+          self.set_animation(self.IDLE_ANIMATION)
+          return
       self.next_frame()
       self.set_frame(self.current_frame)
+      
+  def use_tool(self):
+    self.current_state = self.USING_STATE
+    self.set_animation(self.TILLING_ANIMATION)
   
   # function to call when any arrow key is pressed, update the position of character and it's direction
   def move(self, direction):
     speed = 0
+    if self.current_state == self.USING_STATE:
+      return
+    
     if self.running:
       speed = self.RUN_SPEED
     else:
@@ -121,8 +135,9 @@ class Player:
     self.screen_rect.center = (self.pos_x, self.pos_y) # update the location
       
   def stop_move(self):
-    self.current_state = self.IDLE_STATE
-    self.set_animation(self.IDLE_ANIMATION)
+    if self.current_state == self.MOVING_STATE:
+      self.current_state = self.IDLE_STATE
+      self.set_animation(self.IDLE_ANIMATION)
     
   def start_running(self):
     self.running = True
