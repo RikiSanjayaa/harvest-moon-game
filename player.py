@@ -145,7 +145,10 @@ class Player:
       
   def stop_running(self):
     self.running = False
-    self.set_animation(self.WALK_ANIMATION)
+    if self.current_state == self.MOVING_STATE:
+      self.set_animation(self.WALK_ANIMATION)
+    else:
+      self.set_animation(self.IDLE_ANIMATION)
     
   def update(self):
     self.update_animation()
