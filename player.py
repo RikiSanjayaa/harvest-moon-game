@@ -85,6 +85,7 @@ class Player:
   def next_frame(self):
     self.current_frame = self.current_animation[self.animation_index][0]
     self.current_duration = self.current_animation[self.animation_index][1]
+    self.on_frame()
     
   def set_animation(self, animation):
     self.current_animation = animation
@@ -184,4 +185,4 @@ class Player:
     
   def on_frame(self):
     if self.current_frame == self.TILLING_FRAME:
-      pass
+      self.field.till_tile(self.reticle_x, self.reticle_y)
