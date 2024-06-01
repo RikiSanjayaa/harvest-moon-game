@@ -15,8 +15,8 @@ RIGHT = 3
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
-player = Player()
 field = Field()
+player = Player(field)
 
 run = True
 while run:

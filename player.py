@@ -1,4 +1,5 @@
 import pygame
+from field import Field
 
 class Player:
   # State consts
@@ -15,6 +16,7 @@ class Player:
   RIGHT = 3
   
   FRAME_SIZE = (100, 100)
+  TILE_SIZE = 32
   
   # Animations
   WALK_DURATION = 6
@@ -24,7 +26,11 @@ class Player:
   RUN_ANIMATION = [(0, RUN_DURATION), (3, RUN_DURATION), (0, RUN_DURATION), (4, RUN_DURATION)]
   TILLING_ANIMATION = [(12, 15), (13, 4), (14, 8), (15, 30)]
   
+  TILLING_FRAME = 14
+  
   # Variables
+  field = None
+  
   # starting position of the character
   pos_x = 400   # horizontal position 
   pos_y = 400   # vertikal position
@@ -39,6 +45,11 @@ class Player:
   current_duration = 0
   animation_index = 0
   
+  tile_x = 0
+  tile_y = 0
+  reticle_x = 0
+  reticle_y = 0
+  
   running = False
   
   # rectangle to print the sprite to screen
@@ -47,7 +58,8 @@ class Player:
   
   spritesheet = None    # the whole spritesheet
   
-  def __init__(self):
+  def __init__(self, f):
+    self.field = f
     # load the spritesheet
     self.spritesheet = pygame.image.load("farmer-big.png").convert_alpha()
     # set what sprite to render based on the spritesheet
@@ -133,6 +145,8 @@ class Player:
       self.pos_x -= speed
             
     self.screen_rect.center = (self.pos_x, self.pos_y) # update the location
+    self.update_tile_position()
+    self.field.set_reticle_pos(self.reticle_x, self.reticle_y)
       
   def stop_move(self):
     if self.current_state == self.MOVING_STATE:
@@ -152,3 +166,22 @@ class Player:
     
   def update(self):
     self.update_animation()
+    
+  def update_tile_position(self):
+    self.tile_x = self.pos_x // self.TILE_SIZE
+    self.reticle_x = self.tile_x
+    if self.current_direction == self.LEFT:
+      self.reticle_x -= 1
+    elif self.current_direction == self.RIGHT:
+      self.reticle_x += 1
+      
+    self.tile_y = self.pos_y // self.TILE_SIZE
+    self.reticle_y = self.tile_y
+    if self.current_direction == self.UP:
+      self.reticle_y -= 1
+    elif self.current_direction == self.DOWN:
+      self.reticle_y += 1
+    
+  def on_frame(self):
+    if self.current_frame == self.TILLING_FRAME:
+      pass
