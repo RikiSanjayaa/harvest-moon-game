@@ -1,5 +1,6 @@
 import pygame
 from player import Player
+from field import Field
 
 pygame.init()
 
@@ -15,6 +16,7 @@ RIGHT = 3
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 player = Player()
+field = Field()
 
 run = True
 while run:
@@ -58,6 +60,7 @@ while run:
   # update code
   player.update()
       
+  field.draw(screen)
   player.draw(screen)
 
   pygame.display.flip()
