@@ -134,16 +134,20 @@ class Player:
     
     if direction == self.DOWN:
       self.current_direction = self.DOWN
-      self.pos_y += speed
+      if self.pos_y <= 780:
+        self.pos_y += speed
     elif direction == self.UP:
       self.current_direction = self.UP
-      self.pos_y -= speed
+      if self.pos_y >= 20:
+        self.pos_y -= speed
     elif direction == self.RIGHT:
       self.current_direction = self.RIGHT
-      self.pos_x += speed
+      if self.pos_x <= 780:
+        self.pos_x += speed
     elif direction == self.LEFT:
       self.current_direction = self.LEFT
-      self.pos_x -= speed
+      if self.pos_x >= 20:
+        self.pos_x -= speed
             
     self.screen_rect.center = (self.pos_x, self.pos_y) # update the location
     self.update_tile_position()
