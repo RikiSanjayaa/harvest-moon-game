@@ -6,6 +6,7 @@ class Player:
   IDLE_STATE = 0
   MOVING_STATE = 1
   USING_STATE = 2
+  SWITCHING_STATE = 3
   
   WALK_SPEED = 3
   RUN_SPEED = 6
@@ -16,7 +17,23 @@ class Player:
   RIGHT = 3
   
   FRAME_SIZE = (100, 100)
+  TOOL_FRAME_SIZE = (32, 32)
+  TOOL_OFFSET = (-40, -50)
   TILE_SIZE = 32
+  
+  # Tool consts
+  HOE = 0
+  WATERING_CAN = 1
+  # SICLE = 2
+  # HAMMER = 3
+  # AXE = 4
+  TURNIP_SEED = 5
+  
+  # Tool vars
+  cur_tool = 0
+  tools = [HOE, WATERING_CAN, TURNIP_SEED]
+  tool_frame_rect = pygame.Rect(0, 0, TOOL_FRAME_SIZE[0], TOOL_FRAME_SIZE[1])
+  tool_screen_rect = pygame.Rect(0, 0, TOOL_FRAME_SIZE[0], TOOL_FRAME_SIZE[1])
   
   # Animations
   WALK_DURATION = 6
@@ -25,6 +42,9 @@ class Player:
   WALK_ANIMATION = [(0, WALK_DURATION), (1, WALK_DURATION), (0, WALK_DURATION), (2, WALK_DURATION)]
   RUN_ANIMATION = [(0, RUN_DURATION), (3, RUN_DURATION), (0, RUN_DURATION), (4, RUN_DURATION)]
   TILLING_ANIMATION = [(12, 15), (13, 4), (14, 8), (15, 30)]
+  WATERING_ANIMATION = [(16, 15), (17, 30), (16, 7)]
+  SOW_ANIMATION = [(18, 10), (19, 10), (20, 10), (21, 10), (22, 30)]
+  TOOL_SWITCH_ANIMATION = [(11, 45)]
   
   TILLING_FRAME = 14
   
@@ -57,11 +77,13 @@ class Player:
   screen_rect = None    # rectangle position of the character in the screen
   
   spritesheet = None    # the whole spritesheet
+  tool_sheet = None
   
   def __init__(self, f):
     self.field = f
     # load the spritesheet
     self.spritesheet = pygame.image.load("farmer-big.png").convert_alpha()
+    self.tool_sheet = pygame.image.load("tools-big.png").convert_alpha()
     # set what sprite to render based on the spritesheet
     self.frame_rect = pygame.Rect(0, 0, self.FRAME_SIZE[0], self.FRAME_SIZE[1])
     # set where the sprite is rendered on the screen
@@ -73,6 +95,9 @@ class Player:
   # function to call to draw/render the sprite to the screen, need screen as input
   def draw(self, screen):
     screen.blit(self.spritesheet, self.screen_rect, self.frame_rect)
+    
+    if self.current_state == self.SWITCHING_STATE:
+      screen.blit(self.tool_sheet, self.tool_screen_rect, self.tool_frame_rect)
     
   # function to call when changing the frame of the sprite
   def set_frame(self, frame):
@@ -110,9 +135,26 @@ class Player:
       self.next_frame()
       self.set_frame(self.current_frame)
       
+  def next_tool(self):
+    if self.current_state != self.IDLE_STATE and self.current_state != self.MOVING_STATE:
+      return
+    self.current_state = self.SWITCHING_STATE
+    self.cur_tool += 1
+    if self.cur_tool >= len(self.tools):
+      self.cur_tool = 0
+    self.set_animation(self.TOOL_SWITCH_ANIMATION)
+    
+    self.tool_frame_rect.topleft = (self.tools[self.cur_tool] * self.TOOL_FRAME_SIZE[0], 0)
+    self.tool_screen_rect.topleft = (self.pos_x + self.TOOL_OFFSET[0], self.pos_y + self.TOOL_OFFSET[1])
+      
   def use_tool(self):
     self.current_state = self.USING_STATE
-    self.set_animation(self.TILLING_ANIMATION)
+    if self.tools[self.cur_tool] == self.HOE:
+      self.set_animation(self.TILLING_ANIMATION)
+    elif self.tools[self.cur_tool] == self.WATERING_CAN:
+      self.set_animation(self.WATERING_ANIMATION)
+    elif self.tools[self.cur_tool] == self.TURNIP_SEED:
+      self.set_animation(self.SOW_ANIMATION)
   
   # function to call when any arrow key is pressed, update the position of character and it's direction
   def move(self, direction):

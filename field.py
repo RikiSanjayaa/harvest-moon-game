@@ -17,7 +17,7 @@ class Field:
   reticle_sprite = None
   screen_rect = pygame.Rect(0, 0, TILE_SIZE, TILE_SIZE)
   tile_rect = pygame.Rect(0, 0, TILE_SIZE, TILE_SIZE)
-  reticle_rect = pygame.Rect(400, 400, TILE_SIZE, TILE_SIZE)
+  reticle_rect = pygame.Rect(383, 417, TILE_SIZE, TILE_SIZE)
   
   def __init__(self):
     for x in range(0, self.FIELD_WIDTH):
