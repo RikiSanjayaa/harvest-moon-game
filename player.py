@@ -47,6 +47,8 @@ class Player:
   TOOL_SWITCH_ANIMATION = [(11, 45)]
   
   TILLING_FRAME = 14
+  SOW_FRAME = 22
+  WATER_FRAME = 17
   
   # Variables
   field = None
@@ -232,3 +234,7 @@ class Player:
   def on_frame(self):
     if self.current_frame == self.TILLING_FRAME:
       self.field.till_tile(self.reticle_x, self.reticle_y)
+    elif self.current_frame == self.SOW_FRAME:
+      self.field.sow_tile(self.tile_x, self.tile_y)
+    elif self.current_frame == self.WATER_FRAME:
+      self.field.water_tile(self.reticle_x, self.reticle_y)

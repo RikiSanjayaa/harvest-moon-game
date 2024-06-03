@@ -10,6 +10,7 @@ class Field:
   SHEET_COLS = 2
   
   TILLED_SOIL_FRAME = 4
+  TURNIP_SEED_FRAME = 6
   
   # Field Variables
   ground_tiles = []
@@ -44,6 +45,24 @@ class Field:
   def till_tile(self, tile_x, tile_y):
     if self.ground_tiles[tile_x][tile_y] <= 3:
       self.ground_tiles[tile_x][tile_y] = self.TILLED_SOIL_FRAME
+  
+  def water_tile(self, tile_x, tile_y):
+    if self.ground_tiles[tile_x][tile_y] == self.TILLED_SOIL_FRAME:
+      self.ground_tiles[tile_x][tile_y] += 1
+  
+  def sow_tile(self, tile_x, tile_y):
+    # sow seed in 3x3 grid
+    for y in range(-1, 2):
+      for x in range(-1, 2):
+        cur_x = tile_x + x
+        cur_y = tile_y + y
+    
+        # check if tiles are within bounds, only modify tilled soil
+        if (cur_x >= 0 and cur_x < self.FIELD_WIDTH
+            and cur_y >= 0 and cur_y < self.FIELD_HEIGHT
+            and (self.ground_tiles[cur_x][cur_y] == self.TILLED_SOIL_FRAME
+                or self.ground_tiles[cur_x][cur_y] == self.TILLED_SOIL_FRAME + 1)):
+          self.ground_tiles[cur_x][cur_y] = self.TURNIP_SEED_FRAME + (self.ground_tiles[cur_x][cur_y] % 2)
     
   def draw(self, screen):
     for y in range(0, self.FIELD_HEIGHT):
