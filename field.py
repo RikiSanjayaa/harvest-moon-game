@@ -47,7 +47,7 @@ class Field:
       self.ground_tiles[tile_x][tile_y] = self.TILLED_SOIL_FRAME
   
   def water_tile(self, tile_x, tile_y):
-    if self.ground_tiles[tile_x][tile_y] == self.TILLED_SOIL_FRAME:
+    if self.ground_tiles[tile_x][tile_y] % 2 == 0 and self.ground_tiles[tile_x][tile_y] > 3:
       self.ground_tiles[tile_x][tile_y] += 1
   
   def sow_tile(self, tile_x, tile_y):
