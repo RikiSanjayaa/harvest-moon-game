@@ -18,7 +18,19 @@ class Game:
     self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
     self.clock = pygame.time.Clock()
     self.field = Field()
-    self.player = Player(self.field)
+    self.player = Player(self)
+    
+  def set_reticle_pos(self, tile_x, tile_y):
+    self.field.set_reticle_pos(tile_x, tile_y)
+    
+  def till_tile(self, tile_x, tile_y):
+    self.field.till_tile(tile_x, tile_y)
+  
+  def sow_tile(self, tile_x, tile_y):
+    self.field.sow_tile(tile_x, tile_y)
+  
+  def water_tile(self, tile_x, tile_y):
+    self.field.water_tile(tile_x, tile_y)
     
   def update(self):
       # Run game at 60 FPS

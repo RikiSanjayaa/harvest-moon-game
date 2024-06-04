@@ -1,5 +1,4 @@
 import pygame
-from field import Field
 
 class Player:
   # State consts
@@ -51,7 +50,7 @@ class Player:
   WATER_FRAME = 17
   
   # Variables
-  field = None
+  game = None
   
   # starting position of the character
   pos_x = 400   # horizontal position 
@@ -81,8 +80,8 @@ class Player:
   spritesheet = None    # the whole spritesheet
   tool_sheet = None
   
-  def __init__(self, f):
-    self.field = f
+  def __init__(self, g):
+    self.game = g
     # load the spritesheet
     self.spritesheet = pygame.image.load("farmer-big.png").convert_alpha()
     self.tool_sheet = pygame.image.load("tools-big.png").convert_alpha()
@@ -195,7 +194,7 @@ class Player:
             
     self.screen_rect.center = (self.pos_x, self.pos_y) # update the location
     self.update_tile_position()
-    self.field.set_reticle_pos(self.reticle_x, self.reticle_y)
+    self.game.set_reticle_pos(self.reticle_x, self.reticle_y)
       
   def stop_move(self):
     if self.current_state == self.MOVING_STATE:
@@ -233,8 +232,8 @@ class Player:
     
   def on_frame(self):
     if self.current_frame == self.TILLING_FRAME:
-      self.field.till_tile(self.reticle_x, self.reticle_y)
+      self.game.till_tile(self.reticle_x, self.reticle_y)
     elif self.current_frame == self.SOW_FRAME:
-      self.field.sow_tile(self.tile_x, self.tile_y)
+      self.game.sow_tile(self.tile_x, self.tile_y)
     elif self.current_frame == self.WATER_FRAME:
-      self.field.water_tile(self.reticle_x, self.reticle_y)
+      self.game.water_tile(self.reticle_x, self.reticle_y)
