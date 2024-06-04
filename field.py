@@ -11,6 +11,8 @@ class Field:
   
   TILLED_SOIL_FRAME = 4
   TURNIP_SEED_FRAME = 6
+  ROCK_FRAME = 42
+  WEED_FRAME = 43
   
   # Field Variables
   ground_tiles = []
@@ -24,7 +26,13 @@ class Field:
     for x in range(0, self.FIELD_WIDTH):
       field_row = []
       for y in range(0, self.FIELD_HEIGHT):
-        field_row.append(random.randint(0, 3))
+        rand_spawn = random.randint(0, 20)
+        if rand_spawn == 0:
+          field_row.append(self.ROCK_FRAME)
+        elif rand_spawn == 1:
+          field_row.append(self.WEED_FRAME)
+        else:
+          field_row.append(random.randint(0, 3))
       self.ground_tiles.append(field_row)
     self.spritesheet = pygame.image.load("field-big.png")
     self.reticle_sprite = pygame.image.load("reticle-big.png")
