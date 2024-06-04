@@ -14,6 +14,13 @@ class Field:
   ROCK_FRAME = 42
   WEED_FRAME = 43
   
+  # item const
+  NO_ITEM = -1
+  ROCK_ITEM = 0
+  WEED_ITEM = 1
+  TURNIP_ITEM = 2
+  DROP_SUCCESS = 9
+  
   # Field Variables
   ground_tiles = []
   spritesheet = None
@@ -40,12 +47,12 @@ class Field:
   def set_reticle_pos(self, tile_x, tile_y):
     if tile_x < 0:
       tile_x = 0
-    elif tile_x > self.FIELD_WIDTH:
+    elif tile_x >= self.FIELD_WIDTH:
       tile_x = self.FIELD_WIDTH
     
     if tile_y < 0:
       tile_y = 0
-    elif tile_y > self.FIELD_HEIGHT:
+    elif tile_y >= self.FIELD_HEIGHT:
       tile_y = self.FIELD_HEIGHT
       
     self.reticle_rect.topleft = (self.TILE_SIZE * tile_x, self.TILE_SIZE * tile_y)
@@ -55,7 +62,7 @@ class Field:
       self.ground_tiles[tile_x][tile_y] = self.TILLED_SOIL_FRAME
   
   def water_tile(self, tile_x, tile_y):
-    if self.ground_tiles[tile_x][tile_y] % 2 == 0 and self.ground_tiles[tile_x][tile_y] > 3:
+    if self.ground_tiles[tile_x][tile_y] % 2 == 0 and self.ground_tiles[tile_x][tile_y] > 3 and self.ground_tiles[tile_x][tile_y] < 36:
       self.ground_tiles[tile_x][tile_y] += 1
   
   def sow_tile(self, tile_x, tile_y):
@@ -71,6 +78,26 @@ class Field:
             and (self.ground_tiles[cur_x][cur_y] == self.TILLED_SOIL_FRAME
                 or self.ground_tiles[cur_x][cur_y] == self.TILLED_SOIL_FRAME + 1)):
           self.ground_tiles[cur_x][cur_y] = self.TURNIP_SEED_FRAME + (self.ground_tiles[cur_x][cur_y] % 2)
+          
+  def use_tile(self, tile_x, tile_y):
+    if self.ground_tiles[tile_x][tile_y] == self.ROCK_FRAME:
+      self.ground_tiles[tile_x][tile_y] = random.randint(0, 3)
+      return self.ROCK_ITEM
+    elif self.ground_tiles[tile_x][tile_y] == self.WEED_FRAME:
+      self.ground_tiles[tile_x][tile_y] = random.randint(0, 3)
+      return self.WEED_ITEM
+    else:
+      return self.NO_ITEM
+    
+  def drop_item(self, tile_x, tile_y, item_type):
+    if self.ground_tiles[tile_x][tile_y] > 5:
+      return self.NO_ITEM
+    else:
+      if item_type == self.ROCK_ITEM:
+        self.ground_tiles[tile_x][tile_y] = self.ROCK_FRAME
+      elif item_type == self.WEED_ITEM:
+        self.ground_tiles[tile_x][tile_y] = self.WEED_FRAME
+      return self.DROP_SUCCESS
     
   def draw(self, screen):
     for y in range(0, self.FIELD_HEIGHT):

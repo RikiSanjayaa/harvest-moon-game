@@ -32,6 +32,12 @@ class Game:
   def water_tile(self, tile_x, tile_y):
     self.field.water_tile(tile_x, tile_y)
     
+  def use_tile(self, tile_x, tile_y):
+    return self.field.use_tile(tile_x, tile_y)
+  
+  def drop_item(self, tile_x, tile_y, item_type):
+    return self.field.drop_item(tile_x, tile_y, item_type)
+    
   def update(self):
       # Run game at 60 FPS
       self.clock.tick(60)
@@ -59,6 +65,8 @@ class Game:
           self.player.use_tool()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
           self.player.next_tool()
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_c:
+          self.player.use_hand()
         
         # listen to hold l shift key
         if event.type == pygame.KEYDOWN and event.key == pygame.K_LSHIFT:
