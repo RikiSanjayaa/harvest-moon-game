@@ -174,6 +174,8 @@ class Player:
       self.current_state = self.IDLE_STATE
       
   def next_tool(self):
+    if self.holding:
+      return
     self.current_state = self.SWITCHING_STATE
     self.cur_tool += 1
     if self.cur_tool >= len(self.tools):
@@ -184,6 +186,8 @@ class Player:
     self.tool_screen_rect.topleft = (self.pos_x + self.TOOL_OFFSET[0], self.pos_y + self.TOOL_OFFSET[1])
       
   def use_tool(self):
+    if self.holding:
+      return
     self.current_state = self.USING_STATE
     if self.tools[self.cur_tool] == self.HOE:
       self.set_animation(self.TILLING_ANIMATION)
