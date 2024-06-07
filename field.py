@@ -11,6 +11,8 @@ class Field:
   
   TILLED_SOIL_FRAME = 4
   TURNIP_SEED_FRAME = 6
+  TURNIP_FRAME_0 = 8
+  TURNIP_FRAME_1 = 10
   ROCK_FRAME = 42
   WEED_FRAME = 43
   
@@ -24,8 +26,21 @@ class Field:
   HOUSE_TILES = []
   BIN_TILES = []
   
+  ITEM_VALUES = {
+    ROCK_ITEM: 1,
+    WEED_ITEM: 1,
+    TURNIP_ITEM: 100,
+  }
+  
+  GROWTH_THRESHOLDS = {
+    TURNIP_SEED_FRAME: 1,
+    TURNIP_FRAME_0: 2,
+    TURNIP_FRAME_1: -1,
+  }
+  
   # Field Variables
   ground_tiles = []
+  ground_growths = []
   spritesheet = None
   reticle_sprite = None
   bin_sprite = None
@@ -35,6 +50,7 @@ class Field:
   reticle_rect = pygame.Rect(383, 417, TILE_SIZE, TILE_SIZE)
   bin_rect = None
   house_rect = None
+  shipped_amount = 0
   
   def __init__(self):
     for house_x in range(0, 8):
@@ -45,8 +61,12 @@ class Field:
       for bin_y in range(4, 6):
         self.BIN_TILES.append((bin_x, bin_y))
     
+    print(self.HOUSE_TILES)
+    print(self.BIN_TILES)
+    
     for x in range(0, self.FIELD_WIDTH):
       field_row = []
+      growth_row = []
       for y in range(0, self.FIELD_HEIGHT):
         rand_spawn = random.randint(0, 20)
         if (x, y) in self.HOUSE_TILES or (x, y) in self.BIN_TILES:
@@ -58,8 +78,9 @@ class Field:
             field_row.append(self.WEED_FRAME)
           else:
             field_row.append(random.randint(0, 3))
-          
+          growth_row.append(0)
       self.ground_tiles.append(field_row)
+      self.ground_growths.append(growth_row)
     self.spritesheet = pygame.image.load("field-big.png")
     self.reticle_sprite = pygame.image.load("reticle-big.png")
     self.bin_sprite = pygame.image.load("bin-big.png").convert_alpha()
@@ -105,17 +126,28 @@ class Field:
           self.ground_tiles[cur_x][cur_y] = self.TURNIP_SEED_FRAME + (self.ground_tiles[cur_x][cur_y] % 2)
           
   def use_tile(self, tile_x, tile_y):
+    if (tile_x, tile_y) in self.HOUSE_TILES:
+      self.next_day()
     if self.ground_tiles[tile_x][tile_y] == self.ROCK_FRAME:
       self.ground_tiles[tile_x][tile_y] = random.randint(0, 3)
       return self.ROCK_ITEM
     elif self.ground_tiles[tile_x][tile_y] == self.WEED_FRAME:
       self.ground_tiles[tile_x][tile_y] = random.randint(0, 3)
       return self.WEED_ITEM
+    elif self.ground_tiles[tile_x][tile_y] == self.TURNIP_FRAME_1:
+      self.ground_tiles[tile_x][tile_y] = 4
+      return self.TURNIP_ITEM
     else:
       return self.NO_ITEM
     
   def drop_item(self, tile_x, tile_y, item_type):
-    if self.ground_tiles[tile_x][tile_y] > 5:
+    if (tile_x, tile_y) in self.BIN_TILES:
+      self.shipped_amount += self.ITEM_VALUES[item_type]
+      print(self.shipped_amount)
+      return self.DROP_SUCCESS
+    elif (tile_x, tile_y) in self.HOUSE_TILES:
+      return self.NO_ITEM
+    elif self.ground_tiles[tile_x][tile_y] > 5:
       return self.NO_ITEM
     else:
       if item_type == self.ROCK_ITEM:
@@ -123,6 +155,25 @@ class Field:
       elif item_type == self.WEED_ITEM:
         self.ground_tiles[tile_x][tile_y] = self.WEED_FRAME
       return self.DROP_SUCCESS
+    
+  def next_day(self):
+    for y in range(0, self.FIELD_HEIGHT):
+      for x in range(0, self.FIELD_WIDTH):
+        
+        if (self.ground_tiles[x][y] >= self.TURNIP_SEED_FRAME and self.ground_tiles[x][y] <= self.TURNIP_FRAME_1):
+          # increase growth of crops if watered
+          if self.ground_tiles[x][y] % 2 == 1:
+            self.ground_growths[x][y] += 1
+            if self.GROWTH_THRESHOLDS[self.ground_tiles[x][y] - 1] != -1:
+              if self.ground_growths[x][y] >= self.GROWTH_THRESHOLDS[self.ground_tiles[x][y] - 1]:
+                self.ground_growths[x][y] = 0
+                self.ground_tiles[x][y] += 1
+              # reset watered state
+              else:
+                self.ground_tiles[x][y] -= 1
+        elif (self.ground_tiles[x][y] == self.TILLED_SOIL_FRAME + 1):
+          self.ground_tiles[x][y] = self.TILLED_SOIL_FRAME
+      
     
   def draw(self, screen):
     for y in range(0, self.FIELD_HEIGHT):

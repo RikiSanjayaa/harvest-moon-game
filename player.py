@@ -65,7 +65,7 @@ class Player:
   SOW_FRAME = 22
   WATER_FRAME = 17
   PICKUP_FRAME = 5
-  
+
   # Variables
   game = None
   holding = False
@@ -216,7 +216,7 @@ class Player:
   # function to call when any arrow key is pressed, update the position of character and it's direction
   def move(self, direction):
     speed = 0
-    if self.current_state == self.USING_STATE:
+    if self.current_state == self.USING_STATE or self.current_state == self.PICKING_UP_STATE:
       return
     
     if self.running:
